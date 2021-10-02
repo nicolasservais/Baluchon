@@ -21,7 +21,7 @@ class RefreshButton: UIButton, CAAnimationDelegate {
         layerArrowCircle = CALayer()
         super.init(frame: frame)
         start()
-        rotate()
+        //rotate()
     }
     
     required init?(coder: NSCoder) {
@@ -54,10 +54,13 @@ class RefreshButton: UIButton, CAAnimationDelegate {
         pathAnimation.fillMode = CAMediaTimingFillMode.forwards
         pathAnimation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.linear)
         pathAnimation.isRemovedOnCompletion = false
-        pathAnimation.repeatCount = 3
+        pathAnimation.repeatCount = .infinity
         pathAnimation.fromValue = 0
         pathAnimation.toValue = CGFloat.pi*2
         layerArrowCircle.add(pathAnimation, forKey: "anim")
+    }
+    func stopRotate() {
+        layerArrowCircle.removeAllAnimations()
     }
     private func drawArrowCircle(frame: CGRect, thickness: CGFloat) -> UIBezierPath {
         let decalage: CGFloat = thickness/8

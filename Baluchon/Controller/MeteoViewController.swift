@@ -10,8 +10,12 @@ import UIKit
 class MeteoViewController: UIViewController {
 
     var stackView : UIStackView
+    var buttonRefresh: RefreshButton
+    let meteoService: MeteoService
     init() {
         stackView = UIStackView()
+        buttonRefresh = RefreshButton(frame: CGRect(x: 10, y: 60, width: 44, height: 44))
+        meteoService = MeteoService.shared
         super.init(nibName: nil, bundle: nil)
         let icon = UITabBarItem(title: "Meteo", image: UIImage(named: "Meteo32Light.png"), selectedImage: UIImage(named: "Meteo32Light.png"))
                 self.tabBarItem = icon
@@ -53,6 +57,7 @@ class MeteoViewController: UIViewController {
             stackView.heightAnchor.constraint(equalTo: view.heightAnchor)
         ])
     }
+
     private func getView (index: Int) -> UIView {
         let myView: UIView = UIView()
         myView.backgroundColor = .white
@@ -60,8 +65,8 @@ class MeteoViewController: UIViewController {
         myView.layer.borderWidth = 4
         myView.layer.borderColor = UIColor.darkGray.cgColor
                 
-        let buttonRefresh: RefreshButton = RefreshButton(frame: CGRect(x: 10, y: 60, width: 44, height: 44))
-
+        buttonRefresh.addTarget(self, action: #selector(tappedRefreshButton(_sender:)), for: .touchUpInside)
+        
         let label: UILabel = UILabel()
         label.frame = CGRect(x: 8, y: 8, width: view.frame.width, height: 44)
         label.font = UIFont(name: "Arial", size: 30)
@@ -74,8 +79,43 @@ class MeteoViewController: UIViewController {
         if index == 0 {
             label.text = "NewYork"
         } else if index == 1 {
-            label.text = "Dompierre les ormes"
+            label.text = "Lyon"
         }
         return myView
+    }
+    
+    @objc func tappedRefreshButton(_sender:RefreshButton) {
+        toggleActivityIndicator(shown: true)
+        meteoService.getMeteo(lieu: "machin") { (success, weather) in
+            if success, let weather = weather {
+                self.update(weather: weather)
+                self.buttonRefresh.stopRotate()
+            } else {
+                self.presentAlert()
+            }
+        }
+    }
+
+    private func toggleActivityIndicator(shown: Bool) {
+        //activityIndicator.isHidden = !shown
+        //newQuoteButton.isHidden = shown
+        if shown {
+            buttonRefresh.rotate()
+        } else {
+            buttonRefresh.stopRotate()
+        }
+    }
+    
+    private func update(weather: Weather) {
+        print("weather: ",weather.name," temperature:",weather.temp)
+        //quoteLabel.text = quote.text
+        //authorLabel.text = quote.author
+        //imageView.image = UIImage(data: quote.imageData)
+    }
+
+    private func presentAlert() {
+        let alertVC = UIAlertController(title: "Error", message: "The quote download failed.", preferredStyle: .alert)
+        alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+        present(alertVC, animated: true, completion: nil)
     }
 }
