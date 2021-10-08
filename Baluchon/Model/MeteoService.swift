@@ -6,39 +6,42 @@
 //
 
 import Foundation
-struct Weather {
-    var name: String
-    var temp: Float
+
+struct Meteo: Codable {
+    let temperature: Double
+    let icon: String
 }
-struct Coord: Codable {
-    let lon: Float
-    let lat: Float
+struct Weather: Codable {
+    let id: Int
+    let main: String
+    let description: String
+    let icon: String
+}
+struct Main: Codable {
+    let temp: Double
 }
 struct global: Codable {
     let name: String
     let timezone: Int
-    let coord: Coord
+    let main: Main
+    let weather: [Weather]
 }
-class MeteoService {
+
+final class MeteoService {
     
     // MARK: - Singleton pattern
     static var shared = MeteoService()
     private init() {}
 
-    //private static let quoteUrl = URL(string: "https://api.forismatic.com/api/1.0/")!
-    //private let quoteUrl = URL(string: "https://api.openweathermap.org/data/2.5/weather?q=lyon&appid=7f56e99d43347757e34b56dc724c4f14")!
-    //private static let pictureUrl = URL(string: "https://source.unsplash.com/random/1000x1000")!
-    
     private var task: URLSessionDataTask?
     private var meteoSession = URLSession(configuration: .default)
 
     init(urlSession: URLSession) {
-    //task = urlSession
         meteoSession = urlSession
     }
 
-    func getMeteo(lieu: String, callback: @escaping (Bool, Weather?) -> Void) {
-        let request: URLRequest = createMeteoRequest()
+    func getMeteo(place: String, callback: @escaping (Bool, Meteo?) -> Void) {
+        let request: URLRequest = createMeteoRequest(name: place)
         task?.cancel()
         task = meteoSession.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
@@ -53,8 +56,9 @@ class MeteoService {
                 let jsonDecoder = JSONDecoder()
                 do {
                     let parsedJSON = try jsonDecoder.decode(global.self, from: data)
-                    let weather: Weather = Weather(name: parsedJSON.name, temp: parsedJSON.coord.lat)
-                    callback(true, weather)
+                    let meteo: Meteo = Meteo(temperature: parsedJSON.main.temp, icon: parsedJSON.weather[0].icon)
+                    //let meteo: Meteo = Meteo(temperature: 33.0, icon: "")
+                    callback(true, meteo)
                     return
                 } catch {
                     callback(false, nil)
@@ -64,35 +68,25 @@ class MeteoService {
         }
         task?.resume()
     }
-    private func update(quote: global) {
-        //quoteLabel.text = quote.text
-        //authorLabel.text = quote.author
-        //imageView.image = UIImage(data: quote.imageData)
-    }
-    private func createMeteoRequest() -> URLRequest {
-        var request = URLRequest(url: getMeteoURL(lon: 0, lat: 0))
+    private func createMeteoRequest(name: String) -> URLRequest {
+        var request = URLRequest(url: getMeteoURL(name: name))
         request.httpMethod = "GET"
-        //let body = "method=getQuote&lang=en&format=json"
-        //let body = "q=lyon&appid=7f56e99d43347757e34b56dc724c4f14"
-        //request.httpBody = body.data(using: .utf8)
         return request
     }
-    private func getMeteoURL(lon: Float, lat: Float) -> URL {
+    private func getMeteoURL(name: String) -> URL {
         var urlComponents = URLComponents()
         urlComponents.scheme = "https"
         urlComponents.host = "api.openweathermap.org"
         urlComponents.path = "/data/2.5/weather"
         urlComponents.queryItems = [
-            URLQueryItem(name: "appid", value: "7f56e99d43347757e34b56dc724c4f14"),
+            URLQueryItem(name: "appid", value: Key.meteo), // "7f56e99d43347757e34b56dc724c4f14"),
             URLQueryItem(name: "units", value: "metric"),
             URLQueryItem(name: "lang", value: "fr"),
-            URLQueryItem(name: "q", value: "lyon")
+            URLQueryItem(name: "q", value: name)
         ]
         guard let url = urlComponents.url else {
             fatalError("Could not create URL from components")
         }
         return url
-//        let meteoUrl = URL(string: "https://api.openweathermap.org/data/2.5/weather?q=lyon&appid=7f56e99d43347757e34b56dc724c4f14")!
-//        return meteoUrl
     }
 }

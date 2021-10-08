@@ -7,114 +7,82 @@
 
 import UIKit
 
-class MeteoViewController: UIViewController {
-
-    var stackView : UIStackView
-    var buttonRefresh: RefreshButton
-    let meteoService: MeteoService
-    init() {
-        stackView = UIStackView()
-        buttonRefresh = RefreshButton(frame: CGRect(x: 10, y: 60, width: 44, height: 44))
+final class MeteoViewController: UIViewController {
+    private let heightBoxView: CGFloat = 140
+    private let sizeButton: CGFloat = 50
+    private var viewLocal: MeteoView
+    private var viewNY: MeteoView
+    private var buttonRefresh: RefreshButton
+    private let meteoService: MeteoService
+    private let scrollView: UIScrollView
+    private let space: Space
+    init(space:Space) {
+        self.space = space
+        viewLocal = MeteoView()
+        viewNY = MeteoView()
+        buttonRefresh = RefreshButton(frame: CGRect(x: 0, y: 0, width: sizeButton, height: sizeButton), style: .roundedBlue)
         meteoService = MeteoService.shared
+        scrollView = UIScrollView()
         super.init(nibName: nil, bundle: nil)
         let icon = UITabBarItem(title: "Meteo", image: UIImage(named: "Meteo32Light.png"), selectedImage: UIImage(named: "Meteo32Light.png"))
                 self.tabBarItem = icon
-        self.view.addSubview(stackView)
-        self.view.backgroundColor = .darkGray
-        start()
+        self.view.backgroundColor = .systemCyan
+        scrollView.constraintToSafeArea()
     }
-    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    override func viewDidLoad() {
+        buttonRefresh.addTarget(self, action: #selector(tappedRefreshButton(_sender:)), for: .touchUpInside)
+        view.backgroundColor = .white
+        view.addSubview(scrollView)
+        scrollView.addSubview(viewLocal)
+        scrollView.addSubview(viewNY)
+        scrollView.addSubview(buttonRefresh)
+        viewLocal.setData(town: "Lyon", temperature: "21,6°C", weatherIcon: "10d")
+        viewNY.setData(town: "New York", temperature: "23,2°C", weatherIcon: "11d")
+    }
     override func viewWillAppear(_ animated: Bool) {
-        stackView.frame = CGRect(x: view.frame.origin.x, y: view.frame.origin.y, width: view.frame.size.width, height: view.frame.size.height-44)
+        buttonRefresh.changeButton(style: .roundedBlue, animating: true)
     }
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        stackView.frame = CGRect(x: 0, y: 0, width: size.width, height: size.height-44)
+        scrollView.frame = CGRect(x: 0, y: 0, width: size.width, height: size.height)
+        scrollView.contentSize.height = size.height+1
     }
-    override func viewWillLayoutSubviews() {
-    }
-    func start() {
-
-        let subDark: UIView = UIView()
-        subDark.backgroundColor = .darkGray
-        subDark.layer.cornerRadius = 8.0
-        subDark.layer.borderWidth = 4
-        subDark.layer.borderColor = UIColor.darkGray.cgColor
-        stackView = UIStackView(arrangedSubviews: [getView(index: 0),getView(index: 1),subDark])
-        stackView.axis = .vertical
-        stackView.distribution = .fillEqually
-        stackView.spacing = 16.0
-        view.addSubview(stackView)
-        
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-
-        NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: view.topAnchor),
-            stackView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            stackView.rightAnchor.constraint(equalTo: view.rightAnchor),
-            stackView.heightAnchor.constraint(equalTo: view.heightAnchor)
-        ])
-    }
-
-    private func getView (index: Int) -> UIView {
-        let myView: UIView = UIView()
-        myView.backgroundColor = .white
-        myView.layer.cornerRadius = 8.0
-        myView.layer.borderWidth = 4
-        myView.layer.borderColor = UIColor.darkGray.cgColor
-                
-        buttonRefresh.addTarget(self, action: #selector(tappedRefreshButton(_sender:)), for: .touchUpInside)
-        
-        let label: UILabel = UILabel()
-        label.frame = CGRect(x: 8, y: 8, width: view.frame.width, height: 44)
-        label.font = UIFont(name: "Arial", size: 30)
-        label.textAlignment = .left
-        label.textColor = .darkGray
-
-        myView.addSubview(label)
-        myView.addSubview(buttonRefresh)
-        
-        if index == 0 {
-            label.text = "NewYork"
-        } else if index == 1 {
-            label.text = "Lyon"
-        }
-        return myView
+    override func viewDidLayoutSubviews() {
+        viewLocal.frame = CGRect(x: space.left, y: space.up, width: scrollView.frame.width-(space.left+space.right), height: heightBoxView)
+        viewNY.frame = CGRect(x: space.left, y: space.up+space.min+heightBoxView, width: scrollView.frame.width-(space.left+space.right), height: heightBoxView)
+        viewLocal.redraw(size: CGSize(width: scrollView.frame.width-(space.left+space.right), height: heightBoxView))
+        viewNY.redraw(size: CGSize(width: scrollView.frame.width-(space.left+space.right), height: heightBoxView))
+        buttonRefresh.frame = CGRect(x: (scrollView.frame.width/2)-sizeButton/2, y: space.up+heightBoxView-(sizeButton/2)+(space.min/2), width: sizeButton, height: sizeButton)
+        scrollView.contentSize.height = scrollView.frame.height+1
     }
     
     @objc func tappedRefreshButton(_sender:RefreshButton) {
-        toggleActivityIndicator(shown: true)
-        meteoService.getMeteo(lieu: "machin") { (success, weather) in
-            if success, let weather = weather {
-                self.update(weather: weather)
-                self.buttonRefresh.stopRotate()
+        self.buttonRefresh.changeButton(style: .roundedBlueRotate, animating: true)
+        meteoService.getMeteo(place: "lyon") { (success, meteo) in
+            if success, let meteo = meteo {
+                self.viewLocal.setData(town: "Lyon", temperature: String(format: "%.1f°C", meteo.temperature), weatherIcon: meteo.icon)
+
+                self.meteoService.getMeteo(place: "new york") { (success, meteo) in
+                    if success, let meteo = meteo {
+                        self.viewNY.setData(town: "New York", temperature: String(format: "%.1f°C", meteo.temperature), weatherIcon: meteo.icon)
+                        self.buttonRefresh.changeButton(style: .valid, animating: true)
+                    } else {
+                        self.buttonRefresh.changeButton(style: .error, animating: true)
+                        self.presentAlert()
+                    }
+                }
+
             } else {
+                self.buttonRefresh.changeButton(style: .error, animating: true)
                 self.presentAlert()
             }
         }
     }
-
-    private func toggleActivityIndicator(shown: Bool) {
-        //activityIndicator.isHidden = !shown
-        //newQuoteButton.isHidden = shown
-        if shown {
-            buttonRefresh.rotate()
-        } else {
-            buttonRefresh.stopRotate()
-        }
-    }
     
-    private func update(weather: Weather) {
-        print("weather: ",weather.name," temperature:",weather.temp)
-        //quoteLabel.text = quote.text
-        //authorLabel.text = quote.author
-        //imageView.image = UIImage(data: quote.imageData)
-    }
-
     private func presentAlert() {
-        let alertVC = UIAlertController(title: "Error", message: "The quote download failed.", preferredStyle: .alert)
+        let alertVC = UIAlertController(title: "Error", message: "The data download failed.", preferredStyle: .alert)
         alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
         present(alertVC, animated: true, completion: nil)
     }
