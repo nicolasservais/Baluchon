@@ -12,6 +12,7 @@
 		378C28022701FF700070C6A8 /* URLSessionMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378C28012701FF700070C6A8 /* URLSessionMock.swift */; };
 		378C2808270853BA0070C6A8 /* TranslateRessource.json in Resources */ = {isa = PBXBuildFile; fileRef = 378C2807270853BA0070C6A8 /* TranslateRessource.json */; };
 		378C280A270853D30070C6A8 /* ChangeRessource.json in Resources */ = {isa = PBXBuildFile; fileRef = 378C2809270853D30070C6A8 /* ChangeRessource.json */; };
+		379BB5CA27143AEE00737752 /* Key.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379BB5C927143AEE00737752 /* Key.swift */; };
 		379D41C7270AC170002F8B0D /* MeteoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379D41C6270AC170002F8B0D /* MeteoView.swift */; };
 		379D41C9270B3E51002F8B0D /* TranslateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379D41C8270B3E51002F8B0D /* TranslateView.swift */; };
 		379D41CB270B4043002F8B0D /* TranslateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379D41CA270B4043002F8B0D /* TranslateService.swift */; };
@@ -28,7 +29,6 @@
 		37C7CCDC26FE06B3006A5216 /* MeteoRessource.json in Resources */ = {isa = PBXBuildFile; fileRef = 37C7CCDB26FE06B3006A5216 /* MeteoRessource.json */; };
 		37C7CCE026FE0AD0006A5216 /* MockResponseData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C7CCDF26FE0AD0006A5216 /* MockResponseData.swift */; };
 		37CD701426F8D0AA0083D1C2 /* RefreshButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CD701326F8D0AA0083D1C2 /* RefreshButton.swift */; };
-		37D718BC271436AA00C29BD9 /* Key.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D718BB271436AA00C29BD9 /* Key.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +47,7 @@
 		378C28012701FF700070C6A8 /* URLSessionMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionMock.swift; sourceTree = "<group>"; };
 		378C2807270853BA0070C6A8 /* TranslateRessource.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = TranslateRessource.json; sourceTree = "<group>"; };
 		378C2809270853D30070C6A8 /* ChangeRessource.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = ChangeRessource.json; sourceTree = "<group>"; };
+		379BB5C927143AEE00737752 /* Key.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Key.swift; sourceTree = "<group>"; };
 		379D41C6270AC170002F8B0D /* MeteoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeteoView.swift; sourceTree = "<group>"; };
 		379D41C8270B3E51002F8B0D /* TranslateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslateView.swift; sourceTree = "<group>"; };
 		379D41CA270B4043002F8B0D /* TranslateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslateService.swift; sourceTree = "<group>"; };
@@ -67,7 +68,6 @@
 		37C7CCDB26FE06B3006A5216 /* MeteoRessource.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = MeteoRessource.json; sourceTree = "<group>"; };
 		37C7CCDF26FE0AD0006A5216 /* MockResponseData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockResponseData.swift; sourceTree = "<group>"; };
 		37CD701326F8D0AA0083D1C2 /* RefreshButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshButton.swift; sourceTree = "<group>"; };
-		37D718BB271436AA00C29BD9 /* Key.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Key.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -174,7 +174,7 @@
 				379D41CA270B4043002F8B0D /* TranslateService.swift */,
 				377C77B6270C3586001EB638 /* ChangeService.swift */,
 				37C3FA2D27142A3A00FD9BCA /* KeyProtocol.swift */,
-				37D718BB271436AA00C29BD9 /* Key.swift */,
+				379BB5C927143AEE00737752 /* Key.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -320,7 +320,7 @@
 				379D41C9270B3E51002F8B0D /* TranslateView.swift in Sources */,
 				37C7CCD726FCB836006A5216 /* MeteoService.swift in Sources */,
 				37B63EC326EF7D3600A3B8CF /* MeteoViewController.swift in Sources */,
-				37D718BC271436AA00C29BD9 /* Key.swift in Sources */,
+				379BB5CA27143AEE00737752 /* Key.swift in Sources */,
 				37B63E9326EF706500A3B8CF /* AppDelegate.swift in Sources */,
 				37B63E9526EF706500A3B8CF /* SceneDelegate.swift in Sources */,
 				37C3FA2E27142A3A00FD9BCA /* KeyProtocol.swift in Sources */,

@@ -39,16 +39,6 @@ final class TabViewController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
     }
-    func calculSpace() {
-        //print("CALCUL SPACE")
-        let bottom = UIApplication.shared.delegate?.window??.safeAreaInsets.bottom
-        let top = UIApplication.shared.delegate?.window??.safeAreaInsets.top
-        let left = UIApplication.shared.delegate?.window??.safeAreaInsets.left
-        let right = UIApplication.shared.delegate?.window??.safeAreaInsets.right
-        print("bottom \(String(describing: top)) \(String(describing: bottom)) \(String(describing: left)) \(String(describing: right))")
-    }
-
-
 }
 
 extension UIView {
