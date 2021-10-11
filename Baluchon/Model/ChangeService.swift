@@ -77,6 +77,7 @@ final class ChangeService {
         guard let url = urlComponents.url else {
             fatalError("Could not create URL from components")
         }
+        //print("url \(url)")
         return url
     }
 }
