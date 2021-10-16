@@ -18,6 +18,7 @@ final class ChangeService {
     struct Rates: Codable {
         let USD: Double
     }
+    private let host: String = "data.fixer.io"
     // MARK: - Singleton pattern
     static var shared = ChangeService()
     private init() {}
@@ -30,7 +31,7 @@ final class ChangeService {
     }
 
     func getChange(currency: String, callback: @escaping (Bool, Double) -> Void) {
-        let request: URLRequest = createChangeRequest(name: currency)
+        let request: URLRequest = createChangeRequest(name: currency, host: host)
         task?.cancel()
         task = changeSession.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
@@ -44,12 +45,9 @@ final class ChangeService {
                 }
                 let jsonDecoder = JSONDecoder()
                 do {
-                    let string1 = String(data: data, encoding: String.Encoding.utf8) ?? "Data could not be printed"
-                    print("data Change: \(string1)")
-
+                    // let string1 = String(data: data, encoding: String.Encoding.utf8) ?? "Data could not be printed"
+                    // print("data Change: \(string1)")
                     let parsedJSON = try jsonDecoder.decode(CurrencyRate.self, from: data)
-                    //let meteo: Meteo = Meteo(temperature: parsedJSON.main.temp, icon: parsedJSON.weather[0].icon)
-                    //let meteo: Meteo = Meteo(temperature: 33.0, icon: "")
                     callback(true, parsedJSON.rates.USD)
                     return
                 } catch {
@@ -60,24 +58,24 @@ final class ChangeService {
         }
         task?.resume()
     }
-    private func createChangeRequest(name: String) -> URLRequest {
-        var request = URLRequest(url: getChangeURL(name: name))
+    private func createChangeRequest(name: String, host: String) -> URLRequest {
+        var request = URLRequest(url: getChangeURL(name: name, host: host))
         request.httpMethod = "GET"
         return request
     }
-    private func getChangeURL(name: String) -> URL {
+    func getChangeURL(name: String, host: String) -> URL {
         var urlComponents = URLComponents()
         urlComponents.scheme = "http"
-        urlComponents.host = "data.fixer.io"
+        urlComponents.host = host 
         urlComponents.path = "/api/latest"
         urlComponents.queryItems = [
             URLQueryItem(name: "access_key", value: Key.convert),
             URLQueryItem(name: "symbols", value: name) //,AUD,CAD,CHF,CNY,GBP,JPY")
             ]
-        guard let url = urlComponents.url else {
-            fatalError("Could not create URL from components")
+        if let url = urlComponents.url, urlComponents.host != "" {
+            return url
         }
-        //print("url \(url)")
-        return url
+        let emptyUrl = URL(fileURLWithPath: "")
+        return emptyUrl
     }
 }

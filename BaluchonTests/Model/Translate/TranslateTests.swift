@@ -1,63 +1,63 @@
 //
-//  MeteoTests.swift
+//  TranslateTests.swift
 //  BaluchonTests
 //
-//  Created by Nicolas SERVAIS on 24/09/2021.
+//  Created by Nicolas SERVAIS on 14/10/2021.
 //
 
 import XCTest
 @testable import Baluchon
-class MeteoTests: XCTestCase {
+class TranslateTests: XCTestCase {
 
-    func testGetMeteoShouldPostFailedCallbackIfResponseError() {
+    func testGetTranslateShouldPostFailedCallbackIfResponseError() {
         // Given
         URLSessionMock.loadingHandler = { request in
             let response: HTTPURLResponse = MockResponseData.responseKO
             let error: Error? = nil
-            let data: Data? = MockResponseData.meteoCorrectData
+            let data: Data? = MockResponseData.translateCorrectData
             return (response, data, error)
         }
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [URLSessionMock.self]
         let session = URLSession(configuration: configuration)
-        let meteoService = MeteoService(urlSession: session)
+        let translateService = TranslateService(urlSession: session)
         
         // When
         let expectation = XCTestExpectation(description: "Wait for queue change.")
-        meteoService.getMeteo(place: "lyon"){ (success, weatherResult) in
+        translateService.getTranslate(text: "bonjour", lang: "fr-en"){ (success, result) in
         // Then
             XCTAssertFalse(success)
-            XCTAssertNil(weatherResult)
+            XCTAssertEqual(result, "")
             expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 0.3)
+        wait(for: [expectation], timeout: 0.5)
     }
     
-    func testGetMeteoShouldPostFailedCallbackIfError() {
+    func testGetTranslateShouldPostFailedCallbackIfError() {
         // Given
         URLSessionMock.loadingHandler = { request in
             let response: HTTPURLResponse = MockResponseData.responseKO
-            let error: Error? = MockResponseData.meteoError
+            let error: Error? = MockResponseData.translateError
             let data: Data? = nil
             return (response, data, error)
         }
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [URLSessionMock.self]
         let session = URLSession(configuration: configuration)
-        let meteoService = MeteoService(urlSession: session)
-        
+        let translateService = TranslateService(urlSession: session)
+
         // When
         let expectation = XCTestExpectation(description: "Wait for queue change.")
-        meteoService.getMeteo(place: "lyon"){ (success, weatherResult) in
+        translateService.getTranslate(text: "bonjour", lang: "fr-en"){ (success, result) in
         // Then
             XCTAssertFalse(success)
-            XCTAssertNil(weatherResult)
+            XCTAssertEqual(result, "")
             expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 0.3)
+        wait(for: [expectation], timeout: 0.5)
     }
     
-    func testGetMeteoShouldPostFailedCallbackIfNoData() {
+    func testGetTranslateShouldPostFailedCallbackIfNoData() {
         // Given
         URLSessionMock.loadingHandler = { request in
             let response: HTTPURLResponse = MockResponseData.responseOK
@@ -68,20 +68,20 @@ class MeteoTests: XCTestCase {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [URLSessionMock.self]
         let session = URLSession(configuration: configuration)
-        let meteoService = MeteoService(urlSession: session)
-        
+        let translateService = TranslateService(urlSession: session)
+
         // When
         let expectation = XCTestExpectation(description: "Wait for queue change.")
-        meteoService.getMeteo(place: "lyon"){ (success, weatherResult) in
+        translateService.getTranslate(text: "bonjour", lang: "fr-en"){ (success, result) in
         // Then
             XCTAssertFalse(success)
-            XCTAssertNil(weatherResult)
+            XCTAssertEqual(result, "")
             expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 0.3)
+        wait(for: [expectation], timeout: 0.5)
     }
     
-    func testGetMeteoShouldPostFailedCallbackIfIncorrectResponse() {
+    func testGetTranslateShouldPostFailedCallbackIfIncorrectResponse() {
         // Given
         URLSessionMock.loadingHandler = { request in
             let response: HTTPURLResponse = MockResponseData.responseOK
@@ -92,84 +92,77 @@ class MeteoTests: XCTestCase {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [URLSessionMock.self]
         let session = URLSession(configuration: configuration)
-        let meteoService = MeteoService(urlSession: session)
-        
+        let translateService = TranslateService(urlSession: session)
+
         // When
         let expectation = XCTestExpectation(description: "Wait for queue change.")
-        meteoService.getMeteo(place: "lyon"){ (success, weatherResult) in
+        translateService.getTranslate(text: "bonjour", lang: "fr-en"){ (success, result) in
         // Then
             XCTAssertFalse(success)
-            XCTAssertNil(weatherResult)
+            XCTAssertEqual(result, "")
             expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 0.3)
+        wait(for: [expectation], timeout: 0.5)
     }
     
-    func testGetMeteoShouldPostFailedCallbackIfBadData() {
+    func testGetTranslateShouldPostFailedCallbackIfBadData() {
         // Given
         URLSessionMock.loadingHandler = { request in
             let response: HTTPURLResponse = MockResponseData.responseOK
             let error: Error? = nil
-            let data: Data? = MockResponseData.meteoBadData
+            let data: Data? = MockResponseData.translateBadData
             return (response, data, error)
         }
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [URLSessionMock.self]
         let session = URLSession(configuration: configuration)
-        let meteoService = MeteoService(urlSession: session)
-        
+        let translateService = TranslateService(urlSession: session)
+
         // When
         let expectation = XCTestExpectation(description: "Wait for queue change.")
-        meteoService.getMeteo(place: "lyon"){ (success, weatherResult) in
+        translateService.getTranslate(text: "bonjour", lang: "fr-en"){ (success, result) in
         // Then
             XCTAssertFalse(success)
-            XCTAssertNil(weatherResult)
+            XCTAssertEqual(result, "")
             expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 0.3)
+        wait(for: [expectation], timeout: 0.5)
     }
 
-    func testGetMeteoShouldPostOkCallbackIfCorrectData() {
+    func testGetTranslateShouldPostOkCallbackIfCorrectData() {
         // Given
         URLSessionMock.loadingHandler = { request in
             let response: HTTPURLResponse = MockResponseData.responseOK
             let error: Error? = nil
-            let data: Data? = MockResponseData.meteoCorrectData
+            let data: Data? = MockResponseData.translateCorrectData
             return (response, data, error)
         }
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [URLSessionMock.self]
         let session = URLSession(configuration: configuration)
-        let meteoService = MeteoService(urlSession: session)
-        
+        let translateService = TranslateService(urlSession: session)
+
         // When
         let expectation = XCTestExpectation(description: "Wait for queue change.")
-        meteoService.getMeteo(place: "lyon"){ (success, weatherResult) in
+        translateService.getTranslate(text: "bonjour", lang: "fr-en"){ (success, result) in
         // Then
             XCTAssertTrue(success)
-            XCTAssertNotNil(weatherResult)
+            XCTAssertEqual(result, "Good morning")
             expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 0.3)
+        wait(for: [expectation], timeout: 0.5)
     }
     
-    func testGetMeteoURLFailedIfHostEmpty() {
+    func testTranslateGetURLFailedIfHostEmpty() {
         // Given
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [URLSessionMock.self]
         let session = URLSession(configuration: configuration)
-        let meteoService = MeteoService(urlSession: session)
+        let translateService = TranslateService(urlSession: session)
         // When
-        let url = meteoService.getMeteoURL(name: "lyon", host: "")
+        let url = translateService.getTranslateURL(text: "bonjour", lang: "fr-en", host: "")
         // Then
         XCTAssertEqual(url.relativeString, "./")
-    }
-    func testGetCancelButton() {
-        let button: RefreshButton = RefreshButton(frame: CGRect(x: 0, y: 0, width: 40, height: 40), style: .roundedBlue, name: "nil")
-        button.changeButton(style: .error, animating: true)
-        button.changeButton(style: .valid, animating: false)
-        button.changeButton(style: .error, animating: false)
-        button.changeButton(style: .roundedBlueRotate, animating: false)
     }
 
 }

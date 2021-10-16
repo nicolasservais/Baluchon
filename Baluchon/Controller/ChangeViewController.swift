@@ -25,26 +25,36 @@ final class ChangeViewController: UIViewController {
     private let space: Space
     private var tapped: Tapped = .up
     private var currency: Double = 1.09
-
+    private var currencyData: String = "USD"
+    private let viewTranslucent: UIVisualEffectView
+    
     init(space:Space) {
         self.space = space
         viewLocal = ChangeView()
         viewOther = ChangeView()
-        buttonRefresh = RefreshButton(frame: CGRect(x: 0, y: 0, width: sizeButton, height: sizeButton), style: .roundedBlue)
+        buttonRefresh = RefreshButton(frame: CGRect(x: 0, y: 0, width: sizeButton, height: sizeButton), style: .roundedBlue, name: "change")
         changeService = ChangeService.shared
         scrollView = UIScrollView()
+        viewTranslucent = UIVisualEffectView()
         super.init(nibName: nil, bundle: nil)
+        viewLocal.setNamed(name: "euro")
+        viewOther.setNamed(name: "dollar")
         let icon = UITabBarItem(title: "Change", image: UIImage(named: "Dollar.png"), selectedImage: UIImage(named: "Dollar.png"))
                 self.tabBarItem = icon
-        self.view.backgroundColor = .systemGreen
-        scrollView.constraintToSafeArea()
     }
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        // fatalError("init(coder:) has not been implemented")
+        return nil
+    }
+    func setCurrencyData(value: String) {
+        currencyData = value
     }
     override func viewDidLoad() {
+        self.view.backgroundColor = UIColor(red: 0, green: 0.5, blue: 0, alpha: 0.6)
+        scrollView.backgroundColor = .clear
+        viewTranslucent.effect = UIBlurEffect(style: .light)
         buttonRefresh.addTarget(self, action: #selector(tappedRefreshButton(_sender:)), for: .touchUpInside)
-        view.backgroundColor = .white
+        view.addSubview(viewTranslucent)
         view.addSubview(scrollView)
         scrollView.addSubview(viewLocal)
         scrollView.addSubview(viewOther)
@@ -55,10 +65,14 @@ final class ChangeViewController: UIViewController {
         viewOther.getTextField().delegate = self
         viewLocal.setTargetDoneCancelToolBar(controller: self)
         viewOther.setTargetDoneCancelToolBar(controller: self)
+        scrollView.constraintToSafeArea()
     }
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         scrollView.frame = CGRect(x: 0, y: 0, width: size.width, height: size.height)
         scrollView.contentSize.height = size.height+1
+        if tapped == .down && size.width > size.height {
+            scrollUp()
+        }
     }
     override func viewDidLayoutSubviews() {
         viewLocal.frame = CGRect(x: space.left, y: space.up, width: scrollView.frame.width-(space.left+space.right), height: heightBoxView)
@@ -66,11 +80,11 @@ final class ChangeViewController: UIViewController {
         viewLocal.redraw(size: CGSize(width: scrollView.frame.width-(space.left+space.right), height: heightBoxView))
         viewOther.redraw(size: CGSize(width: scrollView.frame.width-(space.left+space.right), height: heightBoxView))
         buttonRefresh.frame = CGRect(x: (scrollView.frame.width/2)-sizeButton/2, y: space.up+heightBoxView-(sizeButton/2)+(space.min/2), width: sizeButton, height: sizeButton)
+        viewTranslucent.frame = self.view.frame
     }
     @objc func tappedRefreshButton(_sender:RefreshButton) {
         self.buttonRefresh.changeButton(style: .roundedBlueRotate, animating: true)
-        
-        changeService.getChange(currency: "USD") { success, result in
+        changeService.getChange(currency: currencyData) { success, result in
             if success {
                 self.currency = result
                 self.viewOther.setCurrency(value: result)
@@ -85,17 +99,19 @@ final class ChangeViewController: UIViewController {
         resetPositionScroll()
         switch tapped {
         case .up:
-            if let euro: Double = Double(viewLocal.getTextField().text ?? "0.0") {
+            if let euro: Double = Double(viewLocal.getTextField().text!) {
                 viewOther.getTextField().text = String(format: "%.2f", euro*currency)
                 viewLocal.getTextField().resignFirstResponder()
             } else {
+                viewLocal.getTextField().resignFirstResponder()
                 self.presentAlert(message: "The number Euro to convert is not correct")
             }
         case .down:
-            if let dollar: Double = Double(viewOther.getTextField().text ?? "0.0") {
+            if let dollar: Double = Double(viewOther.getTextField().text!) {
                 viewLocal.getTextField().text = String(format: "%.2f", dollar/currency)
                 viewOther.getTextField().resignFirstResponder()
             } else {
+                viewOther.getTextField().resignFirstResponder()
                 self.presentAlert(message: "The number Dollar to convert is not correct")
             }
         }
@@ -121,7 +137,7 @@ final class ChangeViewController: UIViewController {
             self.scrollView.contentSize.height = self.scrollView.frame.height+1
         }
     }
-    private func scrollDown(to: CGFloat) {
+    private func scrollUp() {
         UIView.animate(withDuration: 0.3) {
             self.scrollView.contentOffset.y = 154
         } completion: {_ in
@@ -140,7 +156,7 @@ extension ChangeViewController: UITextFieldDelegate {
                 tapped = .down
                 if let orientation = self.view.window?.windowScene?.interfaceOrientation {
                     if orientation == .landscapeLeft || orientation == .landscapeRight {
-                        scrollDown(to: originX)
+                        scrollUp()
                     }
                 }
             }

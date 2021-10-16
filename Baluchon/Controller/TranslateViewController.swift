@@ -20,27 +20,32 @@ final class TranslateViewController: UIViewController {
     private var spaceScroll: CGFloat = 1
     private let space: Space
     private var tapped: Tapped = .up
+    private let viewTranslucent: UIVisualEffectView
+
     init(space:Space) {
         self.space = space
         viewLocal = TranslateView()
         viewTranslate = TranslateView()
-        buttonRefresh = RefreshButton(frame: CGRect(x: 0, y: 0, width: sizeButton, height: sizeButton), style: .arrowBlue)
+        buttonRefresh = RefreshButton(frame: CGRect(x: 0, y: 0, width: sizeButton, height: sizeButton), style: .arrowBlue, name: "translate")
         translateService = TranslateService.shared
         scrollView = UIScrollView()
+        viewTranslucent = UIVisualEffectView()
         super.init(nibName: nil, bundle: nil)
         let icon = UITabBarItem(title: "Translate", image: UIImage(named: "Translate.png"), selectedImage: UIImage(named: "Translate.png"))
                 self.tabBarItem = icon
-        self.view.backgroundColor = .white
-        self.view.backgroundColor = .systemMint
-        scrollView.constraintToSafeArea()
+        viewLocal.setName(name: "french")
+        viewTranslate.setName(name: "english")
     }
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        // fatalError("init(coder:) has not been implemented")
+        return nil
     }
     override func viewDidLoad() {
+        self.view.backgroundColor = UIColor(red: 0.5, green: 0, blue: 0.5, alpha: 0.7)
+        scrollView.backgroundColor = .clear
+        viewTranslucent.effect = UIBlurEffect(style: .light)
         buttonRefresh.addTarget(self, action: #selector(tappedRefreshButton(_sender:)), for: .touchUpInside)
-        view.backgroundColor = .white
-        //redraw(size: CGSize(width: self.view.frame.width, height: self.view.frame.height))
+        view.addSubview(viewTranslucent)
         view.addSubview(scrollView)
         scrollView.addSubview(viewLocal)
         scrollView.addSubview(viewTranslate)
@@ -49,10 +54,14 @@ final class TranslateViewController: UIViewController {
         viewTranslate.setData(language: "Anglais", text: "Type your text here")
         viewLocal.getTextField().delegate = self
         viewTranslate.getTextField().delegate = self
+        scrollView.constraintToSafeArea()
     }
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         scrollView.frame = CGRect(x: 0, y: 0, width: size.width, height: size.height)
         scrollView.contentSize.height = size.height+1
+        if tapped == .down && size.width > size.height {
+            scrollUp()
+        }
     }
     override func viewDidLayoutSubviews() {
         viewLocal.frame = CGRect(x: space.left, y: space.up, width: scrollView.frame.width-(space.left+space.right), height: heightBoxView)
@@ -61,6 +70,7 @@ final class TranslateViewController: UIViewController {
         viewTranslate.redraw(size: CGSize(width: scrollView.frame.width-(space.left+space.right), height: heightBoxView))
         buttonRefresh.frame = CGRect(x: (scrollView.frame.width/2)-sizeButton/2, y: space.up+heightBoxView-(sizeButton/2)+(space.min/2), width: sizeButton, height: sizeButton)
         scrollView.contentSize.height = scrollView.frame.height+1
+        viewTranslucent.frame = self.view.frame
     }
     @objc func tappedRefreshButton(_sender:RefreshButton) {
         self.buttonRefresh.changeButton(style: .roundedBlueRotate, animating: true)
@@ -102,7 +112,7 @@ final class TranslateViewController: UIViewController {
             self.scrollView.contentSize.height = self.scrollView.frame.height+1
         }
     }
-    private func scrollDown(to: CGFloat) {
+    private func scrollUp() {
         UIView.animate(withDuration: 0.3) {
             self.scrollView.contentOffset.y = 154
         } completion: {_ in
@@ -121,7 +131,7 @@ extension TranslateViewController: UITextFieldDelegate {
                 tapped = .down
                 if let orientation = self.view.window?.windowScene?.interfaceOrientation {
                     if orientation == .landscapeLeft || orientation == .landscapeRight {
-                        scrollDown(to: originX)
+                        scrollUp()
                     }
                 }
             }

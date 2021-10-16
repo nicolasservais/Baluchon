@@ -10,7 +10,7 @@ import UIKit
 final class RefreshButton: UIButton {
     
     enum Style {
-        case roundedBlue, roundedGreen, roundedRed, arrowBlue, arrowGreen, roundedBlueRotate, valid, error
+        case roundedBlue, arrowBlue, roundedBlueRotate, valid, error
     }
     private var style: Style
     private let shapeArrowCircle: CAShapeLayer
@@ -22,7 +22,7 @@ final class RefreshButton: UIButton {
     private var bezierValid: UIBezierPath
     private var bezierError: UIBezierPath
 
-    init(frame: CGRect, style:Style) {
+    init(frame: CGRect, style:Style, name: String) {
         self.style = style
         shapeArrowCircle = CAShapeLayer()
         layerArrowCircle = CALayer()
@@ -33,11 +33,13 @@ final class RefreshButton: UIButton {
         bezierPathSource = UIBezierPath()
         bezierPathDestination = UIBezierPath()
         super.init(frame: frame)
+        self.accessibilityIdentifier = name
         start()
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        //fatalError("init(coder:) has not been implemented")
+        return nil
     }
     
     private func redraw(size: CGSize) {
@@ -81,18 +83,9 @@ final class RefreshButton: UIButton {
             case .roundedBlue:
                 moveTo(bezier: bezierRound)
                 shapeArrowCircle.strokeColor = UIColor.systemBlue.cgColor
-            case .roundedGreen:
-                moveTo(bezier: bezierRound)
-                shapeArrowCircle.strokeColor = UIColor.systemGreen.cgColor
-            case .roundedRed:
-                moveTo(bezier: bezierRound)
-                shapeArrowCircle.strokeColor = UIColor.systemRed.cgColor
             case .arrowBlue:
                 moveTo(bezier: bezierArrow)
                 shapeArrowCircle.strokeColor = UIColor.systemBlue.cgColor
-            case .arrowGreen:
-                moveTo(bezier: bezierArrow)
-                shapeArrowCircle.strokeColor = UIColor.systemGreen.cgColor
             case .roundedBlueRotate:
                 moveTo(bezier: bezierRound)
                 shapeArrowCircle.strokeColor = UIColor.systemBlue.cgColor
@@ -109,18 +102,9 @@ final class RefreshButton: UIButton {
             case .roundedBlue:
                 bezierPathDestination = bezierRound
                 shapeArrowCircle.strokeColor = UIColor.systemBlue.cgColor
-            case .roundedGreen:
-                bezierPathDestination = bezierRound
-                shapeArrowCircle.strokeColor = UIColor.systemGreen.cgColor
-            case .roundedRed:
-                bezierPathDestination = bezierRound
-                shapeArrowCircle.strokeColor = UIColor.systemRed.cgColor
             case .arrowBlue:
                 bezierPathDestination = bezierArrow
                 shapeArrowCircle.strokeColor = UIColor.systemBlue.cgColor
-            case .arrowGreen:
-                bezierPathDestination = bezierArrow
-                shapeArrowCircle.strokeColor = UIColor.systemGreen.cgColor
             case .roundedBlueRotate:
                 bezierPathDestination = bezierRound
                 shapeArrowCircle.strokeColor = UIColor.systemBlue.cgColor
@@ -130,7 +114,6 @@ final class RefreshButton: UIButton {
             bezierPathSource = bezierPathDestination
         }
         if self.style == .roundedBlueRotate && style != .roundedBlueRotate {
-            //print("STOP ROTATE")
             stopRotate()
         }
 

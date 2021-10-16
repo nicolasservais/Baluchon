@@ -7,6 +7,24 @@
 
 import Foundation
 class MockResponseData {
+
+    // MARK: - Bad Json Data
+    static var meteoBadData: Data? {
+        let bundle = Bundle(for: MockResponseData.self)
+        let url = bundle.url(forResource: "MeteoRessourceBad", withExtension: "json")!
+        return try! Data(contentsOf: url)
+    }
+    static var translateBadData: Data? {
+        let bundle = Bundle(for: MockResponseData.self)
+        let url = bundle.url(forResource: "TranslateRessourceBad", withExtension: "json")!
+        return try! Data(contentsOf: url)
+    }
+    static var changeBadData: Data? {
+        let bundle = Bundle(for: MockResponseData.self)
+        let url = bundle.url(forResource: "ChangeRessourceBad", withExtension: "json")!
+        return try! Data(contentsOf: url)
+    }
+
     // MARK: - Data
     static var meteoCorrectData: Data? {
         let bundle = Bundle(for: MockResponseData.self)
@@ -15,18 +33,18 @@ class MockResponseData {
     }
     static var translateCorrectData: Data? {
         let bundle = Bundle(for: MockResponseData.self)
-        let url = bundle.url(forResource: "TranslateRessouce", withExtension: "json")!
+        let url = bundle.url(forResource: "TranslateRessource", withExtension: "json")!
         return try! Data(contentsOf: url)
     }
-    static var convertCorrectData: Data? {
+    static var changeCorrectData: Data? {
         let bundle = Bundle(for: MockResponseData.self)
-        let url = bundle.url(forResource: "ConvertRessouce", withExtension: "json")!
+        let url = bundle.url(forResource: "ChangeRessource", withExtension: "json")!
         return try! Data(contentsOf: url)
     }
 
     static let meteoIncorrectData = "erreur".data(using: .utf8)!
     static let translateIncorrectData = "erreur".data(using: .utf8)!
-    static let convertIncorrectData = "erreur".data(using: .utf8)!
+    static let changeIncorrectData = "erreur".data(using: .utf8)!
 
     // MARK: - Response
     static let responseOK = HTTPURLResponse(
@@ -44,6 +62,6 @@ class MockResponseData {
     class TranslateError: Error {}
     static let translateError = TranslateError()
 
-    class ConvertError: Error {}
-    static let convertError = ConvertError()
+    class ChangeError: Error {}
+    static let changeError = ChangeError()
 }

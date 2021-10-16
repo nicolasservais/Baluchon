@@ -22,6 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow()
         window!.rootViewController = tabView
         window!.makeKeyAndVisible()
+
         // Override point for customization after application launch.
         return true
     }

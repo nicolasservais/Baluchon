@@ -28,7 +28,7 @@ struct global: Codable {
 }
 
 final class MeteoService {
-    
+    private let host: String = "api.openweathermap.org"
     // MARK: - Singleton pattern
     static var shared = MeteoService()
     private init() {}
@@ -41,10 +41,14 @@ final class MeteoService {
     }
 
     func getMeteo(place: String, callback: @escaping (Bool, Meteo?) -> Void) {
-        let request: URLRequest = createMeteoRequest(name: place)
+        let request: URLRequest = createMeteoRequest(name: place, host: host)
         task?.cancel()
         task = meteoSession.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
+                
+                //let string1 = String(data: data!, encoding: String.Encoding.utf8) ?? "Data could not be printed"
+                //print("meteo data Change: \(string1)")
+
                 guard let data = data, error == nil else {
                     callback(false,nil)
                     return
@@ -57,7 +61,6 @@ final class MeteoService {
                 do {
                     let parsedJSON = try jsonDecoder.decode(global.self, from: data)
                     let meteo: Meteo = Meteo(temperature: parsedJSON.main.temp, icon: parsedJSON.weather[0].icon)
-                    //let meteo: Meteo = Meteo(temperature: 33.0, icon: "")
                     callback(true, meteo)
                     return
                 } catch {
@@ -68,25 +71,27 @@ final class MeteoService {
         }
         task?.resume()
     }
-    private func createMeteoRequest(name: String) -> URLRequest {
-        var request = URLRequest(url: getMeteoURL(name: name))
+    private func createMeteoRequest(name: String, host: String) -> URLRequest {
+        var request = URLRequest(url: getMeteoURL(name: name, host: host))
         request.httpMethod = "GET"
+        print(request)
         return request
     }
-    private func getMeteoURL(name: String) -> URL {
+    func getMeteoURL(name: String, host: String) -> URL {
         var urlComponents = URLComponents()
         urlComponents.scheme = "https"
-        urlComponents.host = "api.openweathermap.org"
+        urlComponents.host = host
         urlComponents.path = "/data/2.5/weather"
         urlComponents.queryItems = [
-            URLQueryItem(name: "appid", value: Key.meteo), // "7f56e99d43347757e34b56dc724c4f14"),
+            URLQueryItem(name: "appid", value: Key.meteo), //Need to conform KeyProtocol
             URLQueryItem(name: "units", value: "metric"),
             URLQueryItem(name: "lang", value: "fr"),
             URLQueryItem(name: "q", value: name)
         ]
-        guard let url = urlComponents.url else {
-            fatalError("Could not create URL from components")
+        if let url = urlComponents.url, urlComponents.host != "" {
+            return url
         }
-        return url
+        let emptyUrl = URL(fileURLWithPath: "")
+        return emptyUrl
     }
 }
